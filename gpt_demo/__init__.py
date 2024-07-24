@@ -46,7 +46,7 @@ class ChatBotDemo:
     @classmethod
     async def page(cls,
                    examples=[]):
-        with gr.Blocks(css=cls.CSS) as demo:
+        with gr.Blocks(css=cls.CSS, theme="soft", fill_height=True) as demo:
             gr.HTML(f"<h1><center>{cls.TITLE}</center></h1><br>")
             gr.ChatInterface(
                 fn=cls.stream_chat,
