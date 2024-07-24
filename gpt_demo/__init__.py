@@ -6,6 +6,7 @@ import os
 from threading import Thread
 from gpt_demo.cut_messages import string_token_count
 from loguru import logger
+import json
 
 
 class ChatBotDemo:
@@ -77,6 +78,15 @@ class ChatBotDemo:
             )
         return demo
 
+    @classmethod
+    async def run(cls, port: int = 7860, examples_file: str = ""):
+        if examples_file:
+            with open(examples_file, "r") as f:
+                examples = json.loads(f.read())
+        else:
+            examples = []
+        demo = await cls.page(examples=examples)
+        demo.launch(server_name="0.0.0.0", server_port=port)
 
 if __name__ == "__main__":
     demo.launch(server_name="0.0.0.0", server_port=Config.port)
