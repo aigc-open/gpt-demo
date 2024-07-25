@@ -7,11 +7,11 @@
 ## demo 列表
 
 - [x] 通用对话 chat
-- [x] gpt4o-mini-chat 多模态
-- [ ] gpt4o-chat 多模态
+- [x] gpt4o_mini_chat 多模态
+- [ ] gpt4o_chat 多模态
 - [ ] vllm 本地大模型支持适配
-- [ ] vllm 支持 glm-4-9b-chat
-- [ ] vllm 支持 glm-4v-9b 多模态
+- [ ] vllm 支持 glm_4_9b_chat
+- [ ] vllm 支持 glm_4v_9b 多模态
 - [ ] 撰写博客助手
 - [ ] 羽毛球比赛识别
 - [ ] 图片文档解析助手
@@ -30,13 +30,26 @@ pip install git+https://github.com/aigc-open/gpt-demo.git
 ## Run
 
 ```bash
-python3 -m gpt_demo.gpt-chat -p 7899 -e examples_file.json
+python3 -m gpt_demo.gpt_chat -p 7899 -e examples_file.json
 ```
+
+# GPT 版本系列
+
+## online chat all in one
+
+```bash
+python3 -m gpt_demo.chat -p 7899
+```
+
+![](docs/gpt_all_in_one.png)
 
 ## gpt4o-mini-chat
 
 ```bash
-python3 -m gpt_demo.gpt4o-mini-chat -p 7899 -e examples_file.json
+python3 -m gpt_demo.gpt4o_mini_chat -p 7899 -e examples_file.json
 ```
 
 ![](docs/gpt4o-mini.png)
+
+
+# VLLM 本地大模型版本系列

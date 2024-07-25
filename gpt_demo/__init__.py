@@ -84,13 +84,19 @@ class ChatBotDemo:
         return demo
 
     @classmethod
+    def read_examples(cls, examples_file:str):
+        with open(examples_file, "r") as f:
+            examples = json.loads(f.read())
+        return examples
+
+    @classmethod
     def run(cls, port: int = 7860, examples_file: str = ""):
         if examples_file:
-            with open(examples_file, "r") as f:
-                examples = json.loads(f.read())
+            examples = cls.read_examples(examples_file=examples_file)
         else:
             examples = []
-        demo = cls.page(examples=examples)
+        with gr.Blocks(css=cls.CSS, theme="soft", fill_height=True) as demo:
+            cls.page(examples=examples)
         demo.launch(server_name="0.0.0.0", server_port=port)
 
 
