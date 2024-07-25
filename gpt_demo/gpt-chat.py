@@ -7,11 +7,12 @@ from openai import OpenAI
 class ChatBotDemo_(ChatBotDemo):
     TITLE = "GPT 问答"
     client = OpenAI(api_key=EnvConfig.OPENAI_API_KEY, base_url=EnvConfig.OPENAI_BASE_URL)
+    model = EnvConfig.OPENAI_MODEL
 
     @classmethod
     def generate(cls, *args, **kwargs):
         completion = cls.client.chat.completions.create(
-            model=EnvConfig.OPENAI_MODEL,
+            model=cls.model,
             max_tokens=kwargs["max_length"],
             messages=kwargs["message"],
             temperature=kwargs["temperature"],
