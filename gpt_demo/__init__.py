@@ -32,6 +32,10 @@ class ChatBotDemo:
             yield str(int(time.time()))
 
     @classmethod
+    def examples(cls):
+        return []
+
+    @classmethod
     def stream_chat(cls, message: str, history: list, temperature: float, max_length: int):
         conversation = []
         for prompt, answer in history:
@@ -52,6 +56,8 @@ class ChatBotDemo:
 
     @classmethod
     def page(cls, examples=[]):
+        if not examples:
+            examples = cls.examples()
         with gr.Blocks(css=cls.CSS, theme="soft", fill_height=True) as demo:
             gr.HTML(f"<h1><center>{cls.TITLE}</center></h1><br>")
             gr.ChatInterface(

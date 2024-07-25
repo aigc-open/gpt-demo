@@ -27,12 +27,6 @@
 pip install git+https://github.com/aigc-open/gpt-demo.git
 ```
 
-## Run
-
-```bash
-python3 -m gpt_demo.gpt_chat -p 7899 -e examples_file.json
-```
-
 # GPT 版本系列
 
 ## online chat all in one
@@ -49,7 +43,8 @@ python3 -m gpt_demo.chat -p 7899
 python3 -m gpt_demo.gpt4o_mini_chat -p 7899 -e examples_file.json
 ```
 
-![](docs/gpt4o-mini.png)
+- 其中-e 可以自定义示例文件
 
+![](docs/gpt4o-mini.png)
 
 # VLLM 本地大模型版本系列

@@ -2,6 +2,7 @@ from gpt_demo import ChatBotDemo, EnvConfig
 from fire import Fire
 import json
 from openai import OpenAI
+from gpt_demo.examples import Examples
 
 
 class ChatBotDemo_(ChatBotDemo):
@@ -9,6 +10,10 @@ class ChatBotDemo_(ChatBotDemo):
     client = OpenAI(api_key=EnvConfig.OPENAI_API_KEY,
                     base_url=EnvConfig.OPENAI_BASE_URL)
     model = EnvConfig.OPENAI_MODEL
+
+    @classmethod
+    def examples(cls):
+        return Examples.simple_chat()
 
     @classmethod
     def generate(cls, *args, **kwargs):

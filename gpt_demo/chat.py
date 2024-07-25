@@ -12,10 +12,10 @@ class _ChatBotDemo_(ChatBotDemo):
         with gr.Blocks(css=cls.CSS, theme="soft", fill_height=True) as demo:
             with gr.Tab("GPT通用回答"):
                 from gpt_demo.gpt_chat import ChatBotDemo_
-                ChatBotDemo_.page(examples=[["你好，你是谁呢"]])
+                ChatBotDemo_.page()
             with gr.Tab("GPT4o-mini通用回答"):
                 from gpt_demo.gpt4o_mini_chat import ChatBotDemo_
-                ChatBotDemo_.page(examples=[["你好，你是谁呢"]])
+                ChatBotDemo_.page()
         demo.launch(server_name="0.0.0.0", server_port=port)
 
 
