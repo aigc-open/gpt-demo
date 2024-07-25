@@ -4,3 +4,5 @@ loguru==0.7.2
 Pillow==10.4.0
 setuptools==69.5.1
 tiktoken==0.5.2
+python-dotenv==0.13.0
+openai==1.30.1
