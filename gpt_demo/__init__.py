@@ -39,14 +39,16 @@ class ChatBotDemo:
                                 "role": "assistant", "content": answer}])
         conversation.append({"role": "user", "content": message})
 
-        logger.info(f"问题： -\n{conversation}")
+        logger.info(f"问题： {conversation}")
         buffer = ""
         start_time = time.time()
         for data in cls.generate(message=conversation, temperature=temperature, max_length=max_length):
             buffer += data
             yield buffer
+        tps = string_token_count(buffer)/(time.time()- start_time)
         logger.info(
-            f"tps(吞吐): {string_token_count(buffer)/(time.time()- start_time)}")
+            f"tps(吞吐): {tps}")
+        gr.Info(f"Token Per Seconds(吞吐): {round(tps, 2)} ℹ️", duration=5)
 
     @classmethod
     def page(cls, examples=[]):
