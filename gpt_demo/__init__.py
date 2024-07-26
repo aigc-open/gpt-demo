@@ -59,11 +59,11 @@ class ChatBotDemo:
         if not examples:
             examples = cls.examples()
         with gr.Blocks(css=cls.CSS, theme="soft", fill_height=True) as demo:
-            gr.HTML(f"<h1><center>{cls.TITLE}</center></h1><br>")
             gr.ChatInterface(
                 fn=cls.stream_chat,
                 chatbot=gr.Chatbot(height=600),
                 fill_height=True,
+                title=cls.TITLE,
                 additional_inputs_accordion=gr.Accordion(
                     label="⚙️ Parameters", open=False, render=False),
                 additional_inputs=[
@@ -86,6 +86,11 @@ class ChatBotDemo:
                 ],
                 examples=examples,
                 cache_examples=False,
+                submit_btn="🟢 发送",
+                stop_btn="🛑 停止",
+                retry_btn="🔄  重试",
+                undo_btn="↩️ Undo",
+                clear_btn="🗑️  清除",
             )
         return demo
 
