@@ -4,7 +4,7 @@ from PIL import Image
 import gradio as gr
 import os
 from threading import Thread
-from gpt_demo.cut_messages import string_token_count
+from gpt_cut_messages import cut_messages, cut_string, messages_token_count, string_token_count
 from concurrent.futures import ThreadPoolExecutor
 from loguru import logger
 import json
