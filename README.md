@@ -8,6 +8,7 @@
 
 - [x] 通用对话 chat
 - [x] gpt4o_mini_chat 多模态
+- [x] 企业微信ai资讯小助手
 - [ ] gpt4o_chat 多模态
 - [ ] vllm 本地大模型支持适配
 - [ ] vllm 支持 glm_4_9b_chat
@@ -47,5 +48,16 @@ python3 -m gpt_demo.gpt4o_mini_chat -p 7899 -e examples_file.json
 - 其中-e 可以自定义示例文件
 
 ![](docs/gpt4o-mini.png)
+
+## gpt ai 资讯小助手(企业微信ai资讯小助手)
+
+- 将企业微信 webhook key 填入环境变量中
+
+```bash
+python3 -m gpt_demo.news_spider ai_info
+python3 -m gpt_demo.news_spider hf
+python3 -m gpt_demo.news_spider paper
+```
+![](docs/ai-bot.png)
 
 # VLLM 本地大模型版本系列
