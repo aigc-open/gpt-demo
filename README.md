@@ -54,10 +54,9 @@ python3 -m gpt_demo.gpt4o_mini_chat -p 7899 -e examples_file.json
 - 将企业微信 webhook key 填入环境变量中
 
 ```bash
-python3 -m gpt_demo.news_spider ai_info
-python3 -m gpt_demo.news_spider hf
-python3 -m gpt_demo.news_spider paper
+python3 -m gpt_demo.news_spider run -p 7899
 ```
+![](docs/ai-bot-web.png)
 ![](docs/ai-bot.png)
 
 # VLLM 本地大模型版本系列
