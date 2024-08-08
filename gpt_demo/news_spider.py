@@ -259,10 +259,11 @@ class Main:
         logger.info("完成推送")
 
     @classmethod
-    def cron(cls, cron_time="07:00"):
+    def cron(cls):
         logger.info("等待任务")
-        schedule.every().day.at(cron_time).do(cls.all)
-        schedule.every(2).hours.do(cls.sogou)
+        schedule.every().day.at("07:00").do(cls.all)
+        schedule.every().day.at("09:00").do(cls.sogou)
+        schedule.every().day.at("15:00").do(cls.sogou)
         while True:
             schedule.run_pending()  # 运行所有到期的任务
             time.sleep(1)
