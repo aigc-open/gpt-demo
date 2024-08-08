@@ -192,12 +192,15 @@ class Main:
 
     @classmethod
     def all(cls):
+        logger.info("开始制作")
         cls.ai_info()
         cls.hf()
         cls.paper()
+        logger.info("完成推送")
 
     @classmethod
     def cron(cls, cron_time="07:00"):
+        logger.info("等待任务")
         schedule.every().day.at(cron_time).do(cls.all)
         while True:
             schedule.run_pending()  # 运行所有到期的任务
