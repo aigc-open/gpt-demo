@@ -116,3 +116,4 @@ class EnvConfig:
     OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL")
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL")
     WEIXIN_ROBOT_KEY = os.environ.get("WEIXIN_ROBOT_KEY")
+    WEIXIN_ROBOT_KEY_SOGOU = os.environ.get("WEIXIN_ROBOT_KEY_SOGOU")

@@ -86,6 +86,40 @@ class AIBotCNSpider(SimpleSpider):
         return xml_str
 
 
+class SogouSpider(SimpleSpider):
+    def request(self, url):
+        query = "大模型新闻事件 绘图模型新闻事件 ai新闻事件 芯片新闻事件"
+        url = f"https://www.sogou.com/web?query={query}&sourceid=inttime_day&tsn=1"
+        headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'zh-CN,zh;q=0.9',
+            'Connection': 'keep-alive',
+            'Referer': 'https://www.sogou.com/web?query=%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%96%B0%E9%97%BB%E4%BA%8B%E4%BB%B6+%E7%BB%98%E5%9B%BE%E6%A8%A1%E5%9E%8B%E6%96%B0%E9%97%BB%E4%BA%8B%E4%BB%B6+ai%E6%96%B0%E9%97%BB%E4%BA%8B%E4%BB%B6+%E8%8A%AF%E7%89%87%E6%96%B0%E9%97%BB%E4%BA%8B%E4%BB%B6&_ast=1723082430&_asf=www.sogou.com&w=01029901&cid=&s_from=result_up&sut=12334&sst0=1723082491865&lkt=0%2C0%2C0&sugsuv=00302F6AABD4EB6F66B037B6D51AA965&sugtime=1723082491865',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-origin',
+            'Sec-Fetch-User': '?1',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+            'sec-ch-ua': '"Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'Cookie': 'IPLOC=CN5101; SUID=6FEBD4ABC254A20B0000000066B03757; SUV=00302F6AABD4EB6F66B037B6D51AA965; SNUID=098DB2CE656378803B4068966610E314; cuid=AAE2C/jWTQAAAAuiUm+4OAEASQU; browerV=3; osV=1; ariaDefaultTheme=undefined; sw_uuid=4395856612; sg_uuid=5119021488; ABTEST=0|1723082335|v17; sst0=865; LSTMV=776%2C117; LCLKINT=706',
+            'Host': 'www.sogou.com'
+        }
+        html = requests.get(url,headers=headers).text
+
+        soup = BeautifulSoup(html, 'html.parser')
+        news_items = soup.find_all('div', class_='results')
+        xml_str = ""
+        count = 0
+        for elem in news_items:
+            xml_str += str(elem)
+            count += 1
+            if count > 7:
+                break
+        return xml_str
+
 class Main:
     prompt = """
     - 请你将上面内容，解析成结构化数据
@@ -100,8 +134,8 @@ class Main:
     | xxxxx | xxxxx | 2024/08/07 09:32 | xxxxxx |
     """
     normal_prompt = """
-    - 筛选出最新的Top5的AI相关资讯，主要范围为模型,结果中不要带这句话
-    - 给我写一个每日寄语，要求简短，但是要温暖人心，或者俏皮，但一定要富有哲理或者励志，可以你自己原创，也可以引用名人名言。:格式<font color="warning"> 寄语 </font>
+    - 筛选出最新的Top5的AI相关资讯,结果中不要带这句话
+    - 给我写一个每日寄语，要求简短，但是要温暖人心，或者俏皮，引用名人名言。:格式<font color="warning"> 寄语 </font>
     """
 
     @classmethod
@@ -126,8 +160,34 @@ class Main:
         spider = AIBotCNSpider()
         spider.run(params=spider_config)
         res = spider.summary(prompt=prompt)
-        res = '<font color="warning"> 每日最新AI资讯 </font>\n' + res
+        res = '<font color="warning"> 昨日AI资讯 </font>\n' + res
         cls.send_WWXRobot(text=res)
+        return res
+
+    @classmethod
+    def sogou(cls):
+        spider_config = [
+            SimpleSpiderParams(
+                prompt=cls.prompt
+            ),
+        ]
+        now = datetime.datetime.now().strftime("%Y/%m/%d")
+        prompt = f"""
+        - 请你将上述表格汇总
+        - 不要使用代码块``````包起来
+        {cls.normal_prompt}
+        - 只要{now}最近一天的数据，其他的不要
+
+        # 格式如下：
+        > 内容概要: <font color="comment"> xxxx </font>
+        > 发表时间: <font color="comment"> xxxx </font>
+        > 链接地址: <font color="comment"> [xxxx](http://xxxxx) </font>
+        """
+        spider = SogouSpider()
+        spider.run(params=spider_config)
+        res = spider.summary(prompt=prompt)
+        res = '<font color="warning"> 最新AI实时新闻 </font>\n' + res
+        cls.send_WWXRobot(text=res,key=EnvConfig.WEIXIN_ROBOT_KEY_SOGOU)
         return res
 
     @classmethod
@@ -153,7 +213,7 @@ class Main:
         spider = SimpleSpider()
         spider.run(params=spider_config)
         res = spider.summary(prompt=prompt)
-        res = '<font color="warning"> 速览最新开源大模型 </font>\n' + res
+        res = '<font color="warning"> 昨日开源大模型 </font>\n' + res
         cls.send_WWXRobot(text=res)
         return res
 
@@ -181,13 +241,13 @@ class Main:
         spider = PagerSpider()
         spider.run(params=spider_config, system_prompt="你是一个json解析助手")
         res = spider.summary(prompt=prompt)
-        res = '<font color="warning"> 速览最新论文 </font>\n' + res
+        res = '<font color="warning"> 昨日AI论文 </font>\n' + res
         cls.send_WWXRobot(text=res)
         return res
 
     @classmethod
-    def send_WWXRobot(cls, text):
-        wwxrbt = WWXRobot(key=EnvConfig.WEIXIN_ROBOT_KEY)
+    def send_WWXRobot(cls, text, key=EnvConfig.WEIXIN_ROBOT_KEY):
+        wwxrbt = WWXRobot(key=key)
         wwxrbt.send_markdown(content=text)
 
     @classmethod
@@ -202,6 +262,7 @@ class Main:
     def cron(cls, cron_time="07:00"):
         logger.info("等待任务")
         schedule.every().day.at(cron_time).do(cls.all)
+        schedule.every(2).hours.do(cls.sogou)
         while True:
             schedule.run_pending()  # 运行所有到期的任务
             time.sleep(1)
