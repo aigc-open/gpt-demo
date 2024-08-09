@@ -44,7 +44,7 @@ class Main:
         spider = SogouSpider()
         resp: NewsResponse = spider.run(to_weixin_robot=True)
         if resp.info_weixin:
-            res = '<font color="warning"> 最新AI实时新闻 </font>\n' + resp.info_weixin
+            res = '<font color="warning"> AI行业趋势洞察 </font>\n' + resp.info_weixin
             cls.send_WWXRobot(text=res, key=EnvConfig.WEIXIN_ROBOT_KEY_SOGOU)
         cls.update_info(markdown=resp.info_markdown, name="sogou")
         return resp.info_markdown
@@ -125,7 +125,7 @@ class Main:
             gr.HTML("<h6><center>消息每天会自动同步到企业微信机器人中，方便其他同事共享</center></h6>")
             with gr.Row():
                 radio = gr.Radio(
-                    ["昨日AI资讯", "昨日开源大模型", "昨日热门论文", "最新实时新闻"], label="资讯类型")
+                    ["昨日AI资讯", "昨日开源大模型", "昨日热门论文", "AI行业趋势洞察"], label="资讯类型")
                 btn = gr.Button("刷新")
             result = gr.Markdown("### 请选择资讯类型")
             radio.change(fn=change, inputs=radio, outputs=[result])

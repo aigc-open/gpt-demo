@@ -26,6 +26,7 @@ prompt = """
 - 链接地址如果没有域名，请直接加上
 - 如果数据中没有链接地址，则该数据丢弃
 - 不要使用代码块``````包起来
+{extra_prompt}
 
 # 格式如下：
 | 标题 | 内容概要 | 发表时间 | 链接地址 |
@@ -58,7 +59,8 @@ class SimpleSpider:
     model = EnvConfig.OPENAI_MODEL
 
     def set_config(self):
-        self.spider_config = SimpleSpiderParams(prompt=prompt)
+        extra_prompt=""
+        self.spider_config = SimpleSpiderParams(prompt=prompt.format(extra_prompt=extra_prompt))
         self.system_prompt = "你是一个html解析助手"
 
     def __init__(self):
@@ -165,8 +167,9 @@ class SogouSpider(SimpleSpider):
 class HuggingfaceSpider(SimpleSpider):
 
     def set_config(self):
+        extra_prompt="- 你的域名是https://huggingface.co,不要写错了"
         self.spider_config = SimpleSpiderParams(
-            url="https://huggingface.co/models", prompt=prompt)
+            url="https://huggingface.co/models", prompt=prompt.format(extra_prompt=extra_prompt))
         self.system_prompt = "你是一个html解析助手"
 
     def request(self, url):
