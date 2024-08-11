@@ -16,6 +16,12 @@ class _ChatBotDemo_(ChatBotDemo):
             with gr.Tab("GPT4o-mini通用回答"):
                 from gpt_demo.gpt4o_mini_chat import ChatBotDemo_
                 ChatBotDemo_.page()
+            with gr.Tab("本地知识库问答"):
+                from gpt_demo.simple_knowledge_chat import ChatBotDemo_
+                ChatBotDemo_.page()
+            with gr.Tab("博客助手"):
+                from gpt_demo.gpt_write_blog import ChatBotDemo_
+                ChatBotDemo_.page()
         demo.launch(server_name="0.0.0.0", server_port=port)
 
 

@@ -41,8 +41,7 @@ class ChatBotDemo_(ChatBotDemo):
                 knowledge_list.append(doc.page_content)
                 knowledge_str = '\n'.join(knowledge_list)
                 knowledge_str = cut_string(str=knowledge_str, token_limit=2048)
-                conversation.append(
-                    {"role": "system", "content": f"```{knowledge_str}```"})
+                conversation.insert(0, {"role": "system", "content": f"```{knowledge_str}```"})
 
         logger.info(f"问题： {conversation}")
         buffer = ""

@@ -3,6 +3,7 @@
 - 提供 gpt 以及本地大模型 demo
 - 简单对话聊天
 - 复杂的解决方案
+- vllm 私有部署方案
 
 ## demo 列表
 
@@ -10,11 +11,8 @@
 - [x] gpt4o_mini_chat 多模态
 - [x] 企业微信 ai 资讯小助手
 - [x] 知识库问答
+- [x] 撰写博客助手
 - [ ] gpt4o_chat 多模态
-- [ ] vllm 本地大模型支持适配
-- [ ] vllm 支持 glm_4_9b_chat
-- [ ] vllm 支持 glm_4v_9b 多模态
-- [ ] 撰写博客助手
 - [ ] 羽毛球比赛识别
 - [ ] 图片文档解析助手
 - [ ] pdf 文档解析助手
@@ -32,6 +30,8 @@ pip install git+https://github.com/aigc-open/gpt-demo.git
 # GPT 版本系列
 
 ## online chat all in one
+
+- 所有 demo 都可以在这里全看到
 
 ```bash
 python3 -m gpt_demo.chat -p 7899
@@ -65,12 +65,23 @@ python3 -m gpt_demo.news_spider run -p 7899
 - 上传知识库
 - 根据知识库近似搜索，进行 llm rag 知识库问答
 - 项目依赖: https://github.com/aigc-open/llm-knowledge-function
-    - 生成级别的api接口：xxxx
+  - 生成级别的 api 接口：xxxx
 
 ```bash
 python3 -m gpt_demo.simple_knowledge_chat -p 40002
 ```
 
 ![](docs/simple-knowledge-chat.png)
+
+## 博客撰写小助手
+
+- 一键写博客
+- 一键复制 markdown，方便发博客
+
+```bash
+python3 -m gpt_demo.gpt_write_blog -p 40002
+```
+
+![](docs/blog-ai.png)
 
 # VLLM 本地大模型版本系列

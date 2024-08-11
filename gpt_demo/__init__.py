@@ -25,6 +25,7 @@ class ChatBotDemo:
     """
 
     TITLE = "演示"
+    system_messages = [ {"role": "system", "content": f"你是一个有用的助手"}]
 
     @classmethod
     def generate(cls, *args, **kwargs):
@@ -38,6 +39,7 @@ class ChatBotDemo:
     @classmethod
     def stream_chat(cls, message: str, history: list, temperature: float, max_length: int):
         conversation = []
+        conversation += cls.system_messages
         for prompt, answer in history:
             conversation.extend([{"role": "user", "content": prompt}, {
                                 "role": "assistant", "content": answer}])
