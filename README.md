@@ -66,6 +66,11 @@ python3 -m gpt_demo.news_spider run -p 7899
 - 根据知识库近似搜索，进行 llm rag 知识库问答
 - 项目依赖: https://github.com/aigc-open/llm-knowledge-function
     - 生成级别的api接口：xxxx
-  ![](docs/simple-knowledge-chat.png)
+
+```bash
+python3 -m gpt_demo.simple_knowledge_chat -p 40002
+```
+
+![](docs/simple-knowledge-chat.png)
 
 # VLLM 本地大模型版本系列
