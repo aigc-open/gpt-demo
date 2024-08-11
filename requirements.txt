@@ -12,3 +12,4 @@ schedule
 daily-basic-function @ git+https://github.com/aigc-open/daily-basic-function.git
 gpt-cut-messages @ git+https://github.com/aigc-open/gpt-cut-messages.git
 global-config @ git+https://github.com/aigc-open/global-config.git
+llm-knowledge-function @ git+https://github.com/aigc-open/llm-knowledge-function.git

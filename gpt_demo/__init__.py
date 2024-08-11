@@ -58,41 +58,39 @@ class ChatBotDemo:
     def page(cls, examples=[]):
         if not examples:
             examples = cls.examples()
-        with gr.Blocks(css=cls.CSS, theme="soft", fill_height=True) as demo:
-            gr.ChatInterface(
-                fn=cls.stream_chat,
-                chatbot=gr.Chatbot(height=600),
-                fill_height=True,
-                title=cls.TITLE,
-                additional_inputs_accordion=gr.Accordion(
-                    label="⚙️ Parameters", open=False, render=False),
-                additional_inputs=[
-                    gr.Slider(
-                        minimum=0.1,
-                        maximum=1.0,
-                        step=0.1,
-                        value=0.0,
-                        label="Temperature",
-                        render=False,
-                    ),
-                    gr.Slider(
-                        minimum=128,
-                        maximum=8192,
-                        step=1,
-                        value=1024,
-                        label="Max Length",
-                        render=False,
-                    )
-                ],
-                examples=examples,
-                cache_examples=False,
-                submit_btn="🟢 发送",
-                stop_btn="🛑 停止",
-                retry_btn="🔄  重试",
-                undo_btn="↩️ Undo",
-                clear_btn="🗑️  清除",
-            )
-        return demo
+        gr.ChatInterface(
+            fn=cls.stream_chat,
+            chatbot=gr.Chatbot(height=600),
+            fill_height=True,
+            title=cls.TITLE,
+            additional_inputs_accordion=gr.Accordion(
+                label="⚙️ Parameters", open=False, render=False),
+            additional_inputs=[
+                gr.Slider(
+                    minimum=0.1,
+                    maximum=1.0,
+                    step=0.1,
+                    value=0.0,
+                    label="Temperature",
+                    render=False,
+                ),
+                gr.Slider(
+                    minimum=128,
+                    maximum=8192,
+                    step=1,
+                    value=1024,
+                    label="Max Length",
+                    render=False,
+                )
+            ],
+            examples=examples,
+            cache_examples=False,
+            submit_btn="🟢 发送",
+            stop_btn="🛑 停止",
+            retry_btn="🔄  重试",
+            undo_btn="↩️ Undo",
+            clear_btn="🗑️  清除",
+        )
 
     @classmethod
     def read_examples(cls, examples_file:str):
