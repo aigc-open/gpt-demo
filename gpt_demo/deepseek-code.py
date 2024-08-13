@@ -91,7 +91,7 @@ def quick_sort(arr):
             stop = ["\n"]
         else:
             stop = []
-        prompt = f"<｜fim▁begin｜>{pre_code}<｜fim▁hole｜>{after_code}<｜fim▁end｜>"
+        prompt = f"<｜fim▁begin｜>{pre_code}<｜fim▁hole｜>\n{after_code}<｜fim▁end｜>"
         completion = cls.code_client.completions.create(
             model=cls.codebase_model,
             prompt=prompt,
