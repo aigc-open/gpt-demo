@@ -60,6 +60,7 @@ class SimpleSpider:
         md_to_json_prompt = """
             ## markdown 数据解析为 json
             - 请你将上面内容，解析成结构化数据
+            - 筛选出最新的Top5的AI相关资讯,结果中不要带这句话
             - 请你直接返回json数据格式，要求字段为 标题, 内容概要，发表时间, 链接地址
             - 如果没有发表时间的数据，则丢弃不要
             - 链接地址错误的也直接丢弃
@@ -106,9 +107,9 @@ class SimpleSpider:
             max_length=max_length, temperature=temperature, message=message)
         return info
 
-    def generate_warm_words(self, max_length=4096, temperature=0.7):
+    def generate_warm_words(self, max_length=4096, temperature=1.4):
         message = [{"role": "system", "content": "你是一个有用的助手"}, {
-            "role": "user", "content": "给我写一个每日寄语，要求简短，但是要温暖人心，或者俏皮，引用名人名言"}]
+            "role": "user", "content": "给我写一个每日寄语，要求简短，但是要温暖人心，或者俏皮，引用名人名言， 这个寄语要非常简单, 格式要求:   xxxx--名人"}]
         info = self.chat_api(
             max_length=max_length, temperature=temperature, message=message)
         return info
@@ -134,7 +135,7 @@ class SimpleSpider:
         html = requests.get(url).text
         return html
 
-    def run(self, max_length=4096, temperature=0.7, to_weixin_robot=False):
+    def run(self, max_length=4096, temperature=1.4, to_weixin_robot=False):
         logger.info("开始运行...")
         self.set_config()
         param = self.spider_config

@@ -19,8 +19,8 @@ from tinydb.storages import MemoryStorage
 
 
 def init_table():
-    db = TinyDB(storage=MemoryStorage)
-    # db = TinyDB('db.json')
+    # db = TinyDB(storage=MemoryStorage)
+    db = TinyDB('db.json')
     ai_table = db.table('ai')
     for name in ["ai_info", "sogou", "hf", "paper"]:
         ai_table.insert({'markdown': "", "name": name})
