@@ -101,14 +101,14 @@ class ChatBotDemo:
         return examples
 
     @classmethod
-    def run(cls, port: int = 7860, examples_file: str = ""):
+    def run(cls, port: int = 7860, examples_file: str = "", share=False):
         if examples_file:
             examples = cls.read_examples(examples_file=examples_file)
         else:
             examples = []
         with gr.Blocks(css=cls.CSS, theme="soft", fill_height=True) as demo:
             cls.page(examples=examples)
-        demo.launch(server_name="0.0.0.0", server_port=port, share=True)
+        demo.launch(server_name="0.0.0.0", server_port=port, share=share)
 
 
 class EnvConfig:
