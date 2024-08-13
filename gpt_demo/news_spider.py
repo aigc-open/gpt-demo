@@ -13,61 +13,109 @@ from loguru import logger
 import schedule
 import gradio as gr
 import threading
-from gpt_demo.spider import SimpleSpiderParams, SimpleSpider, PagerSpider, AIBotCNSpider, SogouSpider, NewsResponse, HuggingfaceSpider
+from gpt_demo.spider import SimpleSpiderParams, SimpleSpider, PagerSpider, AIBotCNSpider, SogouSpider, HuggingfaceSpider
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
 
 def init_table():
     db = TinyDB(storage=MemoryStorage)
+    # db = TinyDB('db.json')
     ai_table = db.table('ai')
     for name in ["ai_info", "sogou", "hf", "paper"]:
         ai_table.insert({'markdown': "", "name": name})
     return ai_table
 
 
+def format_weixin(sumary, time_, url):
+    return f"""
+> 内容概要: <font color="comment"> {sumary} </font>
+> 发表时间: <font color="comment"> {time_} </font>
+> 链接地址: <font color="comment"> [查看详情]({url}) </font>
+"""
+
+
 class Main:
     ai_table = init_table()
 
     @classmethod
+    def has_table_value(cls, name) -> bool:
+        return len(cls.ai_table.search(Query().name == name)) > 0
+
+    @classmethod
+    def set_table_value(cls, name):
+        return cls.ai_table.insert({'name': name, 'url': name})
+
+    @classmethod
+    def json_to_weixin(cls, info_json):
+        data = ""
+        for info in info_json:
+            if not cls.has_table_value(info.get("链接地址")):
+                cls.set_table_value(info.get("链接地址"))
+                data += format_weixin(sumary=info.get(
+                    "标题")+info.get(
+                    "内容概要"), time_=info.get("发表时间"), url=info.get("链接地址"))
+        return data
+
+    @classmethod
+    def json_to_markdown(cls, info_json):
+        data = "| 标题 | 内容概要 | 发表时间 | 链接地址 |\n| --- | --- | --- | --- |\n"
+        for info in info_json:
+            data += f"""| {info.get("标题")} | {info.get("内容概要")} | {info.get("发表时间")} | [查看详情]({info.get("链接地址")}) |\n"""
+        return data
+
+    @classmethod
     def ai_info(cls):
         spider = AIBotCNSpider()
-        resp: NewsResponse = spider.run(to_weixin_robot=True)
-        if resp.info_weixin:
-            res = '<font color="warning"> 昨日AI资讯 </font>\n' + resp.info_weixin
+        info_json = spider.run(
+            to_weixin_robot=True)
+        if info_json:
+            res = '<font color="warning"> 昨日AI资讯 </font>\n' + \
+                cls.json_to_weixin(
+                    info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
             cls.send_WWXRobot(text=res)
-        cls.update_info(markdown=resp.info_markdown, name="ai_info")
-        return resp.info_markdown
+        cls.update_info(markdown=cls.json_to_markdown(
+            info_json), name="ai_info")
+        return info_json
 
     @classmethod
     def sogou(cls):
         spider = SogouSpider()
-        resp: NewsResponse = spider.run(to_weixin_robot=True)
-        if resp.info_weixin:
-            res = '<font color="warning"> AI行业趋势洞察 </font>\n' + resp.info_weixin
+        info_json = spider.run(
+            to_weixin_robot=True)
+        if info_json:
+            res = '<font color="warning"> AI行业趋势洞察 </font>\n' + \
+                cls.json_to_weixin(
+                    info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
             cls.send_WWXRobot(text=res, key=EnvConfig.WEIXIN_ROBOT_KEY_SOGOU)
-        cls.update_info(markdown=resp.info_markdown, name="sogou")
-        return resp.info_markdown
+        cls.update_info(markdown=cls.json_to_markdown(info_json), name="sogou")
+        return info_json
 
     @classmethod
     def hf(cls):
         spider = HuggingfaceSpider()
-        resp: NewsResponse = spider.run(to_weixin_robot=True)
-        if resp.info_weixin:
-            res = '<font color="warning"> 昨日开源大模型 </font>\n' + resp.info_weixin
+        info_json = spider.run(
+            to_weixin_robot=True)
+        if info_json:
+            res = '<font color="warning"> 昨日开源大模型 </font>\n' + \
+                cls.json_to_weixin(
+                    info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
             cls.send_WWXRobot(text=res, key=EnvConfig.WEIXIN_ROBOT_KEY_SOGOU)
-        cls.update_info(markdown=resp.info_markdown, name="hf")
-        return resp.info_markdown
+        cls.update_info(markdown=cls.json_to_markdown(info_json), name="hf")
+        return info_json
 
     @classmethod
     def paper(cls):
         spider = PagerSpider()
-        resp: NewsResponse = spider.run(to_weixin_robot=True)
-        if resp.info_weixin:
-            res = '<font color="warning"> 昨日AI论文 </font>\n' + resp.info_weixin
+        info_json = spider.run(
+            to_weixin_robot=True)
+        if info_json:
+            res = '<font color="warning"> 昨日AI论文 </font>\n' + \
+                cls.json_to_weixin(
+                    info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
             cls.send_WWXRobot(text=res, key=EnvConfig.WEIXIN_ROBOT_KEY_SOGOU)
-        cls.update_info(markdown=resp.info_markdown, name="paper")
-        return resp.info_markdown
+        cls.update_info(markdown=cls.json_to_markdown(info_json), name="paper")
+        return info_json
 
     @classmethod
     def send_WWXRobot(cls, text, key=EnvConfig.WEIXIN_ROBOT_KEY):
@@ -116,7 +164,7 @@ class Main:
                 return cls.get_info("hf")
             if type_ == "昨日热门论文":
                 return cls.get_info("paper")
-            if type_ == "最新实时新闻":
+            if type_ == "AI行业趋势洞察":
                 return cls.get_info("sogou")
 
         threading.Thread(target=cls.cron).start()

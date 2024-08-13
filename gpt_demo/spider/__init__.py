@@ -1,5 +1,6 @@
 from fire import Fire
 import time
+import json
 import datetime
 import requests
 from gpt_demo import EnvConfig
@@ -18,53 +19,25 @@ class SimpleSpiderParams(BaseModel):
     prompt: str
 
 
-prompt = """
-## 数据格式为markdown
-- 请你将上面内容，解析成结构化数据
-- 请你直接返回markdown 表格数据格式，要求字段为 标题,内容概要，发表时间, 链接地址
-- 如果没有发表时间的数据，则丢弃不要
-- 链接地址如果没有域名，请直接加上
-- 如果数据中没有链接地址，则该数据丢弃
-- 不要使用代码块``````包起来
-{extra_prompt}
-
-# 格式如下：
-| 标题 | 内容概要 | 发表时间 | 链接地址 |
-| --- | --- | --- | --- |
-| xxxxx | xxxxx | 2024/08/07 09:32 | [xxxx](http://xxxxx) |
-"""
-
-weixin_robot_prompt = """
-- 请你将上述表格汇总
-- 不要使用代码块``````包起来
-- 内容摘要最好使用中文描述
-- 筛选出最新的Top5的AI相关资讯,结果中不要带这句话
-- 给我写一个每日寄语，要求简短，但是要温暖人心，或者俏皮，引用名人名言。:格式<font color="warning"> 寄语 </font>
-
-# 格式如下：
-> 内容概要: <font color="comment"> xxxx </font>
-> 发表时间: <font color="comment"> xxxx </font>
-> 链接地址: <font color="comment"> [xxxx](http://xxxxx) </font>
-"""
-
-
-class NewsResponse(BaseModel):
-    info_markdown: str = ""
-    info_weixin: str = ""
-
-
 class SimpleSpider:
+    prompt = """
+    ## 数据格式为markdown
+    - 请你将上面内容，解析成结构化数据
+    - 请你直接返回markdown 表格数据格式，要求字段为 标题,内容概要，发表时间, 链接地址
+    - 如果没有发表时间的数据，则丢弃不要
+    - 链接地址如果没有域名，请直接加上
+    - 如果数据中没有链接地址，则该数据丢弃
+    - 不要使用代码块``````包起来
+    {extra_prompt}
+
+    # 格式如下：
+    | 标题 | 内容概要 | 发表时间 | 链接地址 |
+    | --- | --- | --- | --- |
+    | xxxxx | xxxxx | 2024/08/07 09:32 | [xxxx](http://xxxxx) |
+    """
     client = OpenAI(api_key=EnvConfig.OPENAI_API_KEY,
                     base_url=EnvConfig.OPENAI_BASE_URL)
     model = EnvConfig.OPENAI_MODEL
-
-    def set_config(self):
-        extra_prompt=""
-        self.spider_config = SimpleSpiderParams(prompt=prompt.format(extra_prompt=extra_prompt))
-        self.system_prompt = "你是一个html解析助手"
-
-    def __init__(self):
-        self.spider_results = []
 
     def chat_api(self, *args, **kwargs):
         completion = self.client.chat.completions.create(
@@ -76,31 +49,106 @@ class SimpleSpider:
         )
         return completion.choices[0].message.content
 
+    def page_to_markdown(self, data, max_length=4096, temperature=0.7):
+        param = self.spider_config
+        info = self.llm_data_convert(
+            data=data, prompt=param.prompt, system_prompt=self.system_prompt,
+            max_length=max_length, temperature=temperature)
+        return info
+
+    def markdown_to_json(self, data, max_length=4096, temperature=0.7):
+        md_to_json_prompt = """
+            ## markdown 数据解析为 json
+            - 请你将上面内容，解析成结构化数据
+            - 请你直接返回json数据格式，要求字段为 标题, 内容概要，发表时间, 链接地址
+            - 如果没有发表时间的数据，则丢弃不要
+            - 链接地址错误的也直接丢弃
+            - 不要使用代码块``````包起来
+            - 不要使用 ```json  xxxx ```包裹，直接返回json list给我
+            - 没有数据直接返回 []
+
+            # 格式如下：
+            [
+                {
+                    "标题": "xxx",
+                    "内容概要": "xxx",
+                    "发表时间": "xxx",
+                    "链接地址": "xxx"
+                }
+            ]
+            """
+        info = self.llm_data_convert(
+            data=data, prompt=md_to_json_prompt, system_prompt="你是一个markdown解析助手",
+            max_length=max_length, temperature=temperature)
+        try:
+            return json.loads(info)
+        except Exception as e:
+            logger.warning(e)
+            logger.warning(f"无法json序列化: {info}")
+            return []
+
+    def markdown_to_weixin(self, data, max_length=4096, temperature=0.7):
+        weixin_robot_prompt = """
+        - 请你将上述表格汇总
+        - 不要使用代码块``````包起来
+        - 内容摘要最好使用中文描述
+        - 筛选出最新的Top5的AI相关资讯,结果中不要带这句话
+        - 给我写一个每日寄语，要求简短，但是要温暖人心，或者俏皮，引用名人名言。:格式<font color="warning"> 寄语 </font>
+
+        # 格式如下：
+        > 内容概要: <font color="comment"> xxxx </font>
+        > 发表时间: <font color="comment"> xxxx </font>
+        > 链接地址: <font color="comment"> [xxxx](http://xxxxx) </font>
+        """
+        message = [{"role": "system", "content": "你是一个markdown解析助手"}, {
+            "role": "system", "content": f"```{data}```"}, {"role": "user", "content": weixin_robot_prompt}]
+        info = self.chat_api(
+            max_length=max_length, temperature=temperature, message=message)
+        return info
+
+    def generate_warm_words(self, max_length=4096, temperature=0.7):
+        message = [{"role": "system", "content": "你是一个有用的助手"}, {
+            "role": "user", "content": "给我写一个每日寄语，要求简短，但是要温暖人心，或者俏皮，引用名人名言"}]
+        info = self.chat_api(
+            max_length=max_length, temperature=temperature, message=message)
+        return info
+
+    def llm_data_convert(self, data, prompt, system_prompt="你是一个markdown解析助手", max_length=4096, temperature=0.7):
+        messages = [{"role": "system", "content": system_prompt},
+                    {"role": "system", "content": f"```{data}```"},
+                    {"role": "user", "content": prompt}]
+        info = self.chat_api(
+            max_length=max_length, temperature=temperature, message=messages)
+        return info
+
+    def set_config(self):
+        extra_prompt = ""
+        self.spider_config = SimpleSpiderParams(
+            prompt=self.prompt.format(extra_prompt=extra_prompt))
+        self.system_prompt = "你是一个html解析助手"
+
+    def __init__(self):
+        self.spider_results = []
+
     def request(self, url):
         html = requests.get(url).text
         return html
 
     def run(self, max_length=4096, temperature=0.7, to_weixin_robot=False):
+        logger.info("开始运行...")
         self.set_config()
-        response = NewsResponse()
         param = self.spider_config
         try:
             html = self.request(url=param.url)
         except Exception as e:
             logger.exception(e)
             return response
-        message = [{"role": "system", "content": self.system_prompt}, {
-            "role": "system", "content": f"```{html}```"}, {"role": "user", "content": param.prompt}]
-        info_markdown = self.chat_api(
-            max_length=max_length, temperature=temperature, message=message)
-        response.info_markdown = info_markdown
-        if to_weixin_robot:
-            message = [{"role": "system", "content": "你是一个markdown解析助手"}, {
-                "role": "system", "content": f"```{info_markdown}```"}, {"role": "user", "content": weixin_robot_prompt}]
-            info_weixin = self.chat_api(
-                max_length=max_length, temperature=temperature, message=message)
-            response.info_weixin = info_weixin
-        return response
+        info_markdown = self.page_to_markdown(
+            data=html, max_length=max_length, temperature=temperature)
+        info_json = self.markdown_to_json(
+            data=info_markdown, max_length=max_length, temperature=temperature)
+        logger.info("结束")
+        return info_json
 
 
 class PagerSpider(SimpleSpider):
@@ -167,9 +215,9 @@ class SogouSpider(SimpleSpider):
 class HuggingfaceSpider(SimpleSpider):
 
     def set_config(self):
-        extra_prompt="- 你的域名是https://huggingface.co,不要写错了"
+        extra_prompt = "- 你的域名是https://huggingface.co,不要写错了"
         self.spider_config = SimpleSpiderParams(
-            url="https://huggingface.co/models", prompt=prompt.format(extra_prompt=extra_prompt))
+            url="https://huggingface.co/models", prompt=self.prompt.format(extra_prompt=extra_prompt))
         self.system_prompt = "你是一个html解析助手"
 
     def request(self, url):
