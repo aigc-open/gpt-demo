@@ -12,6 +12,7 @@
 - [x] 企业微信 ai 资讯小助手
 - [x] 知识库问答
 - [x] 撰写博客助手
+- [x] deepseek代码生成
 - [ ] gpt4o_chat 多模态
 - [ ] 羽毛球比赛识别
 - [ ] 图片文档解析助手
@@ -83,5 +84,14 @@ python3 -m gpt_demo.gpt_write_blog -p 40002
 ```
 
 ![](docs/blog-ai.png)
+
+## deepseek代码生成
+- 代码续写
+- 代码中间补全
+
+```bash
+python3 -m gpt_demo.deepseek-code -p 7899
+```
+![](docs/deepseek-code.png)
 
 # VLLM 本地大模型版本系列
