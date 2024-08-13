@@ -108,7 +108,7 @@ class ChatBotDemo:
             examples = []
         with gr.Blocks(css=cls.CSS, theme="soft", fill_height=True) as demo:
             cls.page(examples=examples)
-        demo.launch(server_name="0.0.0.0", server_port=port,share=True)
+        demo.launch(server_name="0.0.0.0", server_port=port, share=True)
 
 
 class EnvConfig:
