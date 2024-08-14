@@ -27,11 +27,11 @@ def init_table():
     return ai_table
 
 
-def format_weixin(sumary, time_, url):
+def format_weixin(sumary, time_, url, title="查看详情"):
     return f"""
 > 内容概要: <font color="comment"> {sumary} </font>
 > 发表时间: <font color="comment"> {time_} </font>
-> 链接地址: <font color="comment"> [查看详情]({url}) </font>
+> 链接地址: <font color="comment"> [{title}]({url}) </font>
 """
 
 
@@ -53,8 +53,7 @@ class Main:
             if not cls.has_table_value(info.get("链接地址")):
                 cls.set_table_value(info.get("链接地址"))
                 data += format_weixin(sumary=info.get(
-                    "标题")+info.get(
-                    "内容概要"), time_=info.get("发表时间"), url=info.get("链接地址"))
+                    "内容概要"), time_=info.get("发表时间"), url=info.get("链接地址"), title=info.get("标题"))
         return data
 
     @classmethod

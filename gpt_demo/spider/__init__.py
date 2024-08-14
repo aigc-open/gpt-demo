@@ -33,7 +33,7 @@ class SimpleSpider:
     # 格式如下：
     | 标题 | 内容概要 | 发表时间 | 链接地址 |
     | --- | --- | --- | --- |
-    | xxxxx | xxxxx | 2024/08/07 09:32 | [xxxx](http://xxxxx) |
+    | xxxxx | xxxxx | 2024/08/07 09:32 | http://xxxxx |
     """
     client = OpenAI(api_key=EnvConfig.OPENAI_API_KEY,
                     base_url=EnvConfig.OPENAI_BASE_URL)
