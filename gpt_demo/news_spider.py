@@ -59,7 +59,9 @@ class Main:
                     break
                 cls.set_table_value(info.get("链接地址"))
                 data += msg
-        logger.info("weixin data length: ", len(data))
+            else:
+                logger.info(f"dumplicate data: {info}")
+        logger.info(f"weixin data length: {len(data)}")
         return data
 
     @classmethod
