@@ -23,7 +23,8 @@ def init_table():
     db = TinyDB('db.json')
     ai_table = db.table('ai')
     for name in ["ai_info", "sogou", "hf", "paper"]:
-        ai_table.insert({'markdown': "", "name": name})
+        if not search(Query().name == name):
+            ai_table.insert({'markdown': "", "name": name})
     return ai_table
 
 
@@ -49,11 +50,16 @@ class Main:
     @classmethod
     def json_to_weixin(cls, info_json):
         data = ""
+        str_length = 0
         for info in info_json:
             if not cls.has_table_value(info.get("链接地址")):
-                cls.set_table_value(info.get("链接地址"))
-                data += format_weixin(sumary=info.get(
+                msg =  format_weixin(sumary=info.get(
                     "内容概要"), time_=info.get("发表时间"), url=info.get("链接地址"), title=info.get("标题"))
+                if len(data) + len(msg) > 4000:
+                    break
+                cls.set_table_value(info.get("链接地址"))
+                data += msg
+        logger.info("weixin data length: ", len(data))
         return data
 
     @classmethod
