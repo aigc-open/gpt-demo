@@ -23,7 +23,7 @@ def init_table():
     db = TinyDB('db.json')
     ai_table = db.table('ai')
     for name in ["ai_info", "sogou", "hf", "paper"]:
-        if not search(Query().name == name):
+        if not ai_table.search(Query().name == name):
             ai_table.insert({'markdown': "", "name": name})
     return ai_table
 
