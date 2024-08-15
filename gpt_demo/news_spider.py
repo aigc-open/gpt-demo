@@ -55,7 +55,7 @@ class Main:
             if not cls.has_table_value(info.get("链接地址")):
                 msg =  format_weixin(sumary=info.get(
                     "内容概要"), time_=info.get("发表时间"), url=info.get("链接地址"), title=info.get("标题"))
-                if len(data) + len(msg) > 4000:
+                if len((data+msg).encode("utf-8"))> 4000:
                     break
                 cls.set_table_value(info.get("链接地址"))
                 data += msg
