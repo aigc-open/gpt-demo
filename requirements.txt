@@ -9,6 +9,7 @@ openai==1.30.1
 WorkWeixinRobot
 bs4
 schedule
+tinydb
 daily-basic-function @ git+https://github.com/aigc-open/daily-basic-function.git
 gpt-cut-messages @ git+https://github.com/aigc-open/gpt-cut-messages.git
 global-config @ git+https://github.com/aigc-open/global-config.git
