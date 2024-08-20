@@ -13,7 +13,7 @@ from loguru import logger
 import schedule
 import gradio as gr
 import threading
-from gpt_demo.spider import SimpleSpiderParams, SimpleSpider, PagerSpider, AIBotCNSpider, SogouSpider, HuggingfaceSpider
+from gpt_demo.spider import SimpleSpiderParams, SimpleSpider, PagerSpider, AIBotCNSpider, SogouSpider, HuggingfaceSpider, AiBaseSpider
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
@@ -61,7 +61,7 @@ class Main:
                 data += msg
             else:
                 logger.info(f"dumplicate data: {info}")
-        logger.info(f"weixin data length: {len(data)}")
+        logger.info(f"weixin data length: {len((data).encode('utf-8'))}")
         return data
 
     @classmethod
@@ -125,6 +125,20 @@ class Main:
         return info_json
 
     @classmethod
+    def aibase(cls):
+        spider = AiBaseSpider()
+        info_json = spider.run(
+            to_weixin_robot=True)
+        if info_json:
+            res = '<font color="warning"> AI行业趋势洞察 </font>\n' + \
+                cls.json_to_weixin(
+                    info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
+            cls.send_WWXRobot(text=res)
+        cls.update_info(markdown=cls.json_to_markdown(info_json), name="aibase")
+        return info_json
+
+
+    @classmethod
     def send_WWXRobot(cls, text, key=EnvConfig.WEIXIN_ROBOT_KEY):
         wwxrbt = WWXRobot(key=key)
         wwxrbt.send_markdown(content=text)
@@ -156,8 +170,8 @@ class Main:
     def cron(cls):
         logger.info("等待任务")
         schedule.every().day.at("07:00").do(cls.all)
-        schedule.every().day.at("09:00").do(cls.sogou)
-        schedule.every().day.at("15:00").do(cls.sogou)
+        schedule.every().day.at("09:00").do(cls.aibase)
+        schedule.every().day.at("15:00").do(cls.aibase)
         while True:
             schedule.run_pending()  # 运行所有到期的任务
             time.sleep(1)
@@ -172,7 +186,7 @@ class Main:
             if type_ == "昨日热门论文":
                 return cls.get_info("paper")
             if type_ == "AI行业趋势洞察":
-                return cls.get_info("sogou")
+                return cls.get_info("aibase")
 
         threading.Thread(target=cls.cron).start()
         with gr.Blocks(theme="soft", fill_height=True) as demo:

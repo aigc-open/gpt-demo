@@ -60,13 +60,14 @@ class SimpleSpider:
         md_to_json_prompt = """
             ## markdown 数据解析为 json
             - 请你将上面内容，解析成结构化数据
-            - 筛选出最新的Top5的AI相关资讯,结果中不要带这句话
+            - 筛选出最新的Top10的AI相关资讯,结果中不要带这句话
             - 请你直接返回json数据格式，要求字段为 标题, 内容概要，发表时间, 链接地址
             - 如果没有发表时间的数据，则丢弃不要
             - 链接地址错误的也直接丢弃
             - 不要使用代码块``````包起来
             - 不要使用 ```json  xxxx ```包裹，直接返回json list给我
             - 没有数据直接返回 []
+            - 内容概要需要很简单的描述，不要太长
 
             # 格式如下：
             [
@@ -93,7 +94,7 @@ class SimpleSpider:
         - 请你将上述表格汇总
         - 不要使用代码块``````包起来
         - 内容摘要最好使用中文描述
-        - 筛选出最新的Top5的AI相关资讯,结果中不要带这句话
+        - 筛选出最新的Top10的AI相关资讯,结果中不要带这句话
         - 给我写一个每日寄语，要求简短，但是要温暖人心，或者俏皮，引用名人名言。:格式<font color="warning"> 寄语 </font>
 
         # 格式如下：
@@ -143,7 +144,7 @@ class SimpleSpider:
             html = self.request(url=param.url)
         except Exception as e:
             logger.exception(e)
-            return response
+            return 
         info_markdown = self.page_to_markdown(
             data=html, max_length=max_length, temperature=temperature)
         info_json = self.markdown_to_json(
@@ -231,5 +232,33 @@ class HuggingfaceSpider(SimpleSpider):
             xml_str += str(elem)
             count += 1
             if count > 7:
+                break
+        return xml_str
+
+
+class AiBaseSpider(SimpleSpider):
+
+    def set_config(self):
+        extra_prompt = "- 你的域名是https://www.aibase.com/,不要写错了"
+        self.spider_config = SimpleSpiderParams(
+            url="https://www.aibase.com/zh/news", prompt=self.prompt.format(extra_prompt=extra_prompt))
+        self.system_prompt = "你是一个html解析助手"
+
+    def request(self, url):
+        headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'zh-CN,zh;q=0.9',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+        }
+        html = requests.get(url, headers=headers).text
+
+        soup = BeautifulSoup(html, 'html.parser')
+        a_items = soup.find_all('a', class_="group")
+        xml_str = ""
+        count = 0
+        for elem in a_items:
+            xml_str += str(elem)
+            count += 1
+            if count > 15:
                 break
         return xml_str
