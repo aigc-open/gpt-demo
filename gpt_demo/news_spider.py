@@ -94,7 +94,7 @@ class Main:
             res = '<font color="warning"> AI行业趋势洞察 </font>\n' + \
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
-            cls.send_WWXRobot(text=res, key=EnvConfig.WEIXIN_ROBOT_KEY_SOGOU)
+            cls.send_WWXRobot(text=res)
         cls.update_info(markdown=cls.json_to_markdown(info_json), name="sogou")
         return info_json
 
@@ -170,8 +170,8 @@ class Main:
     def cron(cls):
         logger.info("等待任务")
         schedule.every().day.at("07:00").do(cls.all)
-        schedule.every().day.at("09:00").do(cls.aibase)
-        schedule.every().day.at("15:00").do(cls.aibase)
+        schedule.every().day.at("09:00").do(cls.sogou)
+        schedule.every().day.at("15:00").do(cls.sogou)
         while True:
             schedule.run_pending()  # 运行所有到期的任务
             time.sleep(1)
@@ -186,7 +186,7 @@ class Main:
             if type_ == "昨日热门论文":
                 return cls.get_info("paper")
             if type_ == "AI行业趋势洞察":
-                return cls.get_info("aibase")
+                return cls.get_info("sogou")
 
         threading.Thread(target=cls.cron).start()
         with gr.Blocks(theme="soft", fill_height=True) as demo:
