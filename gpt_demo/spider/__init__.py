@@ -144,7 +144,7 @@ class SimpleSpider:
             html = self.request(url=param.url)
         except Exception as e:
             logger.exception(e)
-            return 
+            return []
         info_markdown = self.page_to_markdown(
             data=html, max_length=max_length, temperature=temperature)
         info_json = self.markdown_to_json(

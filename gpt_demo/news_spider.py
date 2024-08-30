@@ -81,8 +81,8 @@ class Main:
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
             cls.send_WWXRobot(text=res)
-        cls.update_info(markdown=cls.json_to_markdown(
-            info_json), name="ai_info")
+            cls.update_info(markdown=cls.json_to_markdown(
+                info_json), name="ai_info")
         return info_json
 
     @classmethod
@@ -95,7 +95,7 @@ class Main:
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
             cls.send_WWXRobot(text=res)
-        cls.update_info(markdown=cls.json_to_markdown(info_json), name="sogou")
+            cls.update_info(markdown=cls.json_to_markdown(info_json), name="sogou")
         return info_json
 
     @classmethod
@@ -108,7 +108,7 @@ class Main:
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
             cls.send_WWXRobot(text=res, key=EnvConfig.WEIXIN_ROBOT_KEY_SOGOU)
-        cls.update_info(markdown=cls.json_to_markdown(info_json), name="hf")
+            cls.update_info(markdown=cls.json_to_markdown(info_json), name="hf")
         return info_json
 
     @classmethod
@@ -121,7 +121,7 @@ class Main:
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
             cls.send_WWXRobot(text=res, key=EnvConfig.WEIXIN_ROBOT_KEY_SOGOU)
-        cls.update_info(markdown=cls.json_to_markdown(info_json), name="paper")
+            cls.update_info(markdown=cls.json_to_markdown(info_json), name="paper")
         return info_json
 
     @classmethod
@@ -134,7 +134,7 @@ class Main:
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
             cls.send_WWXRobot(text=res)
-        cls.update_info(markdown=cls.json_to_markdown(info_json), name="aibase")
+            cls.update_info(markdown=cls.json_to_markdown(info_json), name="aibase")
         return info_json
 
 
