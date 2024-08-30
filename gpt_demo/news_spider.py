@@ -30,7 +30,7 @@ def init_table():
 
 def format_weixin(sumary, time_, url, title="查看详情"):
     return f"""
-> 内容概要: <font color="comment"> {sumary} </font>
+> 内容概要: <font color="info"> {sumary} </font>
 > 发表时间: <font color="comment"> {time_} </font>
 > 链接地址: <font color="comment"> [{title}]({url}) </font>
 """
