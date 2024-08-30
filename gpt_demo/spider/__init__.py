@@ -27,6 +27,7 @@ class SimpleSpider:
     - 如果没有发表时间的数据，则丢弃不要
     - 链接地址如果没有域名，请直接加上
     - 如果数据中没有链接地址，则该数据丢弃
+    - 链接地址请使用完整的url，请不要解析那种缩略式的链接
     - 不要使用代码块``````包起来
     {extra_prompt}
 
@@ -219,7 +220,7 @@ class HuggingfaceSpider(SimpleSpider):
     def set_config(self):
         extra_prompt = "- 你的域名是https://huggingface.co,不要写错了"
         self.spider_config = SimpleSpiderParams(
-            url="https://huggingface.co/models", prompt=self.prompt.format(extra_prompt=extra_prompt))
+            url="https://hf-mirror.com/models", prompt=self.prompt.format(extra_prompt=extra_prompt))
         self.system_prompt = "你是一个html解析助手"
 
     def request(self, url):
