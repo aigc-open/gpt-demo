@@ -80,8 +80,8 @@ class Main:
             res = '<font color="warning"> 昨日AI资讯 </font>\n' + \
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
-            cls.send_WWXRobot(text=res)
-            cls.update_info(markdown=cls.json_to_markdown(
+            if cls.send_WWXRobot(text=res):
+                cls.update_info(markdown=cls.json_to_markdown(
                 info_json), name="ai_info")
         return info_json
 
@@ -94,8 +94,8 @@ class Main:
             res = '<font color="warning"> AI行业趋势洞察 </font>\n' + \
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
-            cls.send_WWXRobot(text=res)
-            cls.update_info(markdown=cls.json_to_markdown(info_json), name="sogou")
+            if cls.send_WWXRobot(text=res):
+                cls.update_info(markdown=cls.json_to_markdown(info_json), name="sogou")
         return info_json
 
     @classmethod
@@ -107,8 +107,8 @@ class Main:
             res = '<font color="warning"> 昨日开源大模型 </font>\n' + \
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
-            cls.send_WWXRobot(text=res, key=EnvConfig.WEIXIN_ROBOT_KEY_SOGOU)
-            cls.update_info(markdown=cls.json_to_markdown(info_json), name="hf")
+            if cls.send_WWXRobot(text=res):
+                cls.update_info(markdown=cls.json_to_markdown(info_json), name="hf")
         return info_json
 
     @classmethod
@@ -120,8 +120,8 @@ class Main:
             res = '<font color="warning"> 昨日AI论文 </font>\n' + \
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
-            cls.send_WWXRobot(text=res, key=EnvConfig.WEIXIN_ROBOT_KEY_SOGOU)
-            cls.update_info(markdown=cls.json_to_markdown(info_json), name="paper")
+            if cls.send_WWXRobot(text=res):
+                cls.update_info(markdown=cls.json_to_markdown(info_json), name="paper")
         return info_json
 
     @classmethod
@@ -133,8 +133,8 @@ class Main:
             res = '<font color="warning"> AI行业趋势洞察 </font>\n' + \
                 cls.json_to_weixin(
                     info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
-            cls.send_WWXRobot(text=res)
-            cls.update_info(markdown=cls.json_to_markdown(info_json), name="aibase")
+            if cls.send_WWXRobot(text=res):
+                cls.update_info(markdown=cls.json_to_markdown(info_json), name="aibase")
         return info_json
 
 
@@ -143,8 +143,10 @@ class Main:
         try:
             wwxrbt = WWXRobot(key=key)
             wwxrbt.send_markdown(content=text)
+            return True
         except Exception as e:
             logger.error(f"send_WWXRobot error: {e}")
+            return False
 
     @classmethod
     def update_info(cls, markdown, name):
