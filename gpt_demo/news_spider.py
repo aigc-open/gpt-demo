@@ -140,8 +140,11 @@ class Main:
 
     @classmethod
     def send_WWXRobot(cls, text, key=EnvConfig.WEIXIN_ROBOT_KEY):
-        wwxrbt = WWXRobot(key=key)
-        wwxrbt.send_markdown(content=text)
+        try:
+            wwxrbt = WWXRobot(key=key)
+            wwxrbt.send_markdown(content=text)
+        except Exception as e:
+            logger.error(f"send_WWXRobot error: {e}")
 
     @classmethod
     def update_info(cls, markdown, name):
