@@ -13,7 +13,7 @@ from loguru import logger
 import schedule
 import gradio as gr
 import threading
-from gpt_demo.spider import SimpleSpiderParams, SimpleSpider, PagerSpider, AIBotCNSpider, SogouSpider, HuggingfaceSpider, AiBaseSpider
+from gpt_demo.spider import SimpleSpiderParams, SimpleSpider, PagerSpider, AIBotCNSpider, SogouSpider, HuggingfaceSpider, AiBaseSpider, DuckDuckGoSpider
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
@@ -22,7 +22,7 @@ def init_table():
     # db = TinyDB(storage=MemoryStorage)
     db = TinyDB('db.json')
     ai_table = db.table('ai')
-    for name in ["ai_info", "sogou", "hf", "paper", "aibase"]:
+    for name in ["ai_info", "sogou", "hf", "paper", "aibase", "duckduckgo"]:
         if not ai_table.search(Query().name == name):
             ai_table.insert({'markdown': "", "name": name})
     return ai_table
@@ -30,7 +30,6 @@ def init_table():
 
 def format_weixin(sumary, time_, url, title="查看详情"):
     return f"""
-> 内容概要: <font color="info"> {sumary} </font>
 > 发表时间: <font color="comment"> {time_} </font>
 > 链接地址: <font color="comment"> [{title}]({url}) </font>
 """
@@ -137,6 +136,19 @@ class Main:
                 cls.update_info(markdown=cls.json_to_markdown(info_json), name="aibase")
         return info_json
 
+    @classmethod
+    def duckduckgo(cls):
+        spider = DuckDuckGoSpider()
+        info_json = spider.run(
+            to_weixin_robot=True)
+        if info_json:
+            res = '<font color="warning"> AI行业趋势洞察 </font>\n' + \
+                cls.json_to_weixin(
+                    info_json) + f'\n<font color="warning"> {spider.generate_warm_words()} </font>'
+            if cls.send_WWXRobot(text=res):
+                cls.update_info(markdown=cls.json_to_markdown(info_json), name="duckduckgo")
+        return info_json
+
 
     @classmethod
     def send_WWXRobot(cls, text, key=EnvConfig.WEIXIN_ROBOT_KEY):
@@ -175,8 +187,8 @@ class Main:
     def cron(cls):
         logger.info("等待任务")
         schedule.every().day.at("07:00").do(cls.all)
-        schedule.every().day.at("09:00").do(cls.sogou)
-        schedule.every().day.at("15:00").do(cls.sogou)
+        schedule.every().day.at("09:00").do(cls.duckduckgo)
+        schedule.every().day.at("15:00").do(cls.duckduckgo)
         while True:
             schedule.run_pending()  # 运行所有到期的任务
             time.sleep(1)
@@ -191,7 +203,7 @@ class Main:
             if type_ == "昨日热门论文":
                 return cls.get_info("paper")
             if type_ == "AI行业趋势洞察":
-                return cls.get_info("sogou")
+                return cls.get_info("duckduckgo")
 
         threading.Thread(target=cls.cron).start()
         with gr.Blocks(theme="soft", fill_height=True) as demo:

@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from typing import List
 from loguru import logger
 import schedule
+from duckduckgo_search import DDGS
 
 
 class SimpleSpiderParams(BaseModel):
@@ -120,6 +121,7 @@ class SimpleSpider:
         messages = [{"role": "system", "content": system_prompt},
                     {"role": "system", "content": f"```{data}```"},
                     {"role": "user", "content": prompt}]
+        print(messages)
         info = self.chat_api(
             max_length=max_length, temperature=temperature, message=messages)
         return info
@@ -263,3 +265,32 @@ class AiBaseSpider(SimpleSpider):
             if count > 15:
                 break
         return xml_str
+
+
+class DuckDuckGoSpider(SimpleSpider):
+
+    def request(self, url):
+        results = DDGS().text("大模型新闻事件 绘图模型新闻事件 ai新闻事件 芯片新闻事件", max_results=10,timelimit="d")
+        return results
+
+
+    def run(self, max_length=4096, temperature=1.4, to_weixin_robot=False):
+        logger.info("开始运行...")
+        self.set_config()
+        param = self.spider_config
+        try:
+            html_json = self.request(url=param.url)
+        except Exception as e:
+            logger.exception(e)
+            return []
+        info_json = []
+        for data in html_json:
+            info = {
+                    "标题": data["title"],
+                    "内容概要": data["body"],
+                    "发表时间": "最近",
+                    "链接地址": data["href"],
+                }
+            info_json.append(info)
+        logger.info("结束")
+        return info_json
